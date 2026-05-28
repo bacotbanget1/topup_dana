@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top Up DANA via QRIS — Ariepulsa</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --bg2: #111827;
+    --bg3: #1a2235;
+    --card: #161f33;
+    --card2: #1e2942;
+    --border: rgba(99,179,237,0.15);
+    --border2: rgba(99,179,237,0.3);
+    --accent: #3b82f6;
+    --accent2: #60a5fa;
+    --accent3: #93c5fd;
+    --dana-blue: #118EEA;
+    --dana-light: #e8f4fd;
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --green: #22c55e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(59,130,246,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 80% 80%, rgba(17,142,234,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    position: relative; z-index: 10;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,15,30,0.8);
+    backdrop-filter: blur(20px);
+    padding: 0 24px;
+  }
+  .header-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #118EEA, #3b82f6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; color: #fff;
+  }
+  .logo-text { font-size: 18px; font-weight: 700; }
+  .logo-text span { color: var(--dana-blue); }
+  .badge-powered {
+    font-size: 11px; color: var(--text3);
+    background: var(--bg3); border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: 20px;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    position: relative; z-index: 1;
+    max-width: 900px; margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* HERO */
+  .hero { text-align: center; margin-bottom: 48px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(17,142,234,0.12); border: 1px solid rgba(17,142,234,0.3);
+    padding: 5px 14px; border-radius: 20px; font-size: 12px;
+    color: var(--accent3); margin-bottom: 20px;
+  }
+  .hero-tag::before { content: '●'; font-size: 8px; color: var(--green); }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 42px); font-weight: 800;
+    line-height: 1.15; margin-bottom: 12px;
+    background: linear-gradient(135deg, #f1f5f9 30%, #60a5fa);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .hero p { font-size: 15px; color: var(--text2); max-width: 420px; margin: 0 auto; line-height: 1.6; }
+
+  /* FORM CARD */
+  .form-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+  .form-section-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text3); margin-bottom: 20px; font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .form-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .form-group { margin-bottom: 20px; }
+  label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 7px; font-weight: 500; }
+  input[type="text"], input[type="tel"], input[type="number"], select {
+    width: 100%; padding: 12px 16px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; color: var(--text); font-size: 14px;
+    font-family: inherit; outline: none; transition: border-color .2s, box-shadow .2s;
+    appearance: none;
+  }
+  input:focus, select:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+  }
+  input::placeholder { color: var(--text3); }
+
+  /* PRODUK GRID */
+  .produk-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px; margin-top: 4px;
+  }
+  .produk-item {
+    background: var(--bg2); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 14px 12px;
+    cursor: pointer; transition: all .2s; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .produk-item:hover {
+    border-color: var(--accent); background: var(--card2);
+    transform: translateY(-2px);
+  }
+  .produk-item.selected {
+    border-color: var(--dana-blue); background: rgba(17,142,234,0.1);
+    box-shadow: 0 0 0 1px rgba(17,142,234,0.3);
+  }
+  .produk-item.selected::before {
+    content: '✓'; position: absolute; top: 6px; right: 8px;
+    font-size: 11px; color: var(--dana-blue); font-weight: 700;
+  }
+  .produk-nominal { font-size: 13px; font-weight: 700; color: var(--text); }
+  .produk-harga { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .produk-harga.api { color: var(--accent3); }
+
+  /* SUMMARY */
+  .summary-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; margin-top: 24px;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between;
+    font-size: 13px; padding: 4px 0;
+  }
+  .summary-row .label { color: var(--text2); }
+  .summary-row .value { font-weight: 600; }
+  .summary-row.total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; }
+  .summary-row.total .value { color: var(--dana-blue); font-size: 16px; }
+
+  /* BUTTON */
+  .btn-primary {
+    width: 100%; padding: 15px; margin-top: 20px;
+    background: linear-gradient(135deg, #118EEA, #3b82f6);
+    border: none; border-radius: 12px; color: #fff;
+    font-size: 15px; font-weight: 700; font-family: inherit;
+    cursor: pointer; transition: all .2s; letter-spacing: 0.01em;
+  }
+  .btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:active:not(:disabled) { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-secondary {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); border-radius: 10px; padding: 10px 20px;
+    font-size: 13px; font-family: inherit; cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--text); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 20px; width: 100%; max-width: 400px;
+    padding: 28px; animation: fadeUp .25s ease;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+  .modal-body { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .modal-actions .btn-primary { margin-top: 0; }
+
+  /* RESULT */
+  .result-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; margin-top: 24px;
+    display: none;
+  }
+  .result-card.show { display: block; animation: fadeUp .3s ease; }
+  .result-status {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+  .status-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .status-icon.success { background: rgba(16,185,129,0.15); color: var(--success); }
+  .status-icon.pending { background: rgba(245,158,11,0.15); color: var(--warning); }
+  .status-icon.error { background: rgba(239,68,68,0.15); color: var(--error); }
+  .result-json {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px; font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; color: var(--text2); white-space: pre-wrap;
+    word-break: break-all; max-height: 200px; overflow-y: auto;
+    line-height: 1.6; margin-top: 12px;
+  }
+
+  /* QRIS CONTAINER BOX */
+  .qris-box {
+    margin: 15px auto;
+    max-width: 230px;
+    background: #fff;
+    padding: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .qris-box img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* STATUS CHECKER */
+  .tab-bar {
+    display: flex; gap: 4px; margin-bottom: 28px;
+    background: var(--bg2); border-radius: 12px; padding: 4px;
+  }
+  .tab-btn {
+    flex: 1; padding: 10px; border: none; background: transparent;
+    color: var(--text2); font-size: 13px; font-weight: 600; font-family: inherit;
+    border-radius: 9px; cursor: pointer; transition: all .2s;
+  }
+  .tab-btn.active {
+    background: var(--card2); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* LOADING */
+  .loading-spinner {
+    display: inline-block; width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin .7s linear infinite; margin-right: 8px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--card2); border: 1px solid var(--border2);
+    padding: 12px 20px; border-radius: 12px; font-size: 13px;
+    z-index: 200; opacity: 0; transition: opacity .3s;
+    pointer-events: none; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+  .toast.success { border-color: rgba(16,185,129,0.4); color: var(--success); }
+  .toast.error { border-color: rgba(239,68,68,0.4); color: var(--error); }
+
+  /* INFO BOX */
+  .info-box {
+    background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 10px; padding: 12px 16px; font-size: 12px;
+    color: var(--accent3); line-height: 1.6; margin-top: 8px;
+  }
+
+  @media (max-width: 600px) {
+    .form-card { padding: 20px; }
+    .produk-grid { grid-template-columns: repeat(3, 1fr); }
+    .hero h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">D</div>
+      <div class="logo-text">Top Up <span>DANA</span></div>
+    </div>
+    <div class="badge-powered">Powered by Ariepulsa</div>
+  </div>
+</header>
+
+<div class="main">
+  <div class="hero">
+    <div class="hero-tag">Layanan QRIS Real-time</div>
+    <h1>Top Up DANA<br>Bayar Pakai QRIS</h1>
+    <p>Isi nomor tujuan DANA kamu. Sistem akan membuat QRIS unik otomatis secara real-time.</p>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('topup')">💳 Top Up DANA</button>
+    <button class="tab-btn" onclick="switchTab('status')">🔍 Cek Tiket QRIS</button>
+  </div>
+
+  <div id="tab-topup" class="tab-content active">
+    <div class="form-card">
+      <div class="form-section-title">Info Akun</div>
+
+      <div class="form-group">
+        <label>Nomor HP / Akun DANA</label>
+        <input type="tel" id="noHP" placeholder="Contoh: 081234567890" maxlength="15">
+      </div>
+
+      <div class="form-section-title" style="margin-top:28px;">Pilih Nominal</div>
+
+      <div id="produkContainer">
+        <div class="produk-grid" id="skeletonGrid"></div>
+      </div>
+
+      <div id="summaryBox" class="summary-box" style="display:none;">
+        <div class="summary-row">
+          <span class="label">Produk</span>
+          <span class="value" id="sumProduk">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">Nomor Tujuan DANA</span>
+          <span class="value" id="sumNo">—</span>
+        </div>
+        <div class="summary-row total">
+          <span class="label">Total Nominal QRIS</span>
+          <span class="value" id="sumTotal">—</span>
+        </div>
+      </div>
+
+      <div class="info-box" style="margin-top:20px;">
+        ⚡ Setelah tombol ditekan, sistem akan otomatis men-generate kode QRIS khusus dengan nominal produk yang kamu pilih.
+      </div>
+
+      <button class="btn-primary" id="btnOrder" disabled onclick="confirmOrder()">
+        Buat QRIS Sekarang
+      </button>
+    </div>
+
+    <div id="resultTopup" class="result-card">
+      <div class="result-status">
+        <div class="status-icon" id="resultIcon">⏳</div>
+        <div>
+          <div style="font-weight:700;" id="resultTitle">Memproses...</div>
+          <div style="font-size:13px;color:var(--text3);" id="resultSub">Mohon tunggu</div>
+        </div>
+      </div>
+
+      <div id="qrisContainerBox" style="display: none; text-align: center; margin: 15px 0;">
+        <div class="qris-box">
+          <img src="" id="qrisImgView" alt="Scan QRIS">
+        </div>
+        <div style="font-size: 13px; color: var(--warning); font-weight: 600; margin-bottom: 5px;">
+          Silakan Scan QRIS Di Atas Untuk Melanjutkan Pembayaran
+        </div>
+      </div>
+
+      <div class="result-json" id="resultJSON"></div>
+      <div style="margin-top:14px;font-size:12px;color:var(--text3);" id="resultOrderId"></div>
+    </div>
+  </div>
+
+  <div id="tab-status" class="tab-content">
+    <div class="form-card">
+      <div class="form-section-title">Cek Status Tiket QRIS</div>
+      <div class="form-group">
+        <label>Kode Deposit / Invoice ID</label>
+        <input type="text" id="statusOrderId" placeholder="Masukkan Kode Deposit">
+      </div>
+      <button class="btn-primary" onclick="cekStatus()">
+        Cek Status QRIS
+      </button>
+      <div id="resultStatus" class="result-card" style="margin-top:20px;">
+        <div class="result-status">
+          <div class="status-icon" id="statusIcon">🔍</div>
+          <div>
+            <div style="font-weight:700;" id="statusTitle">—</div>
+            <div style="font-size:13px;color:var(--text3);" id="statusSub">—</div>
+          </div>
+        </div>
+        <div class="result-json" id="statusJSON"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title">⚠️ Konfirmasi Pembuatan Tagihan</div>
+    <div class="modal-body" id="modalBody">Apakah kamu yakin?</div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Batal</button>
+      <button class="btn-primary" id="modalConfirmBtn" onclick="doOrder()">Ya, Buat QRIS</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_KEY = 'wgffhzugbWSoeV5yvIbznaGYraWZFt1U';
+// Menggunakan endpoint /api/qrisorkut digabung dengan Proxy CORS yang sudah kamu jalankan
+const API_URL = 'https://cors-anywhere.herokuapp.com/https://ariepulsa.com/api/qrisorkut';
+
+const produkDANA = [
+  { id: 'DANA5',  nama: 'DANA 5.000',   harga: 5164 },
+  { id: 'DANA10', nama: 'DANA 10.000',  harga: 10164 },
+  { id: 'DANA15', nama: 'DANA 15.000',  harga: 15169 },
+  { id: 'DANA20', nama: 'DANA 20.000',  harga: 20169 },
+  { id: 'DANA25', nama: 'DANA 25.000',  harga: 25169 },
+  { id: 'DANA30', nama: 'DANA 30.000',  harga: 30184 },
+  { id: 'DANA40', nama: 'DANA 40.000',  harga: 40184 },
+  { id: 'DANA50', nama: 'DANA 50.000',  harga: 50184 },
+  { id: 'DANA65', nama: 'DANA 65.000',  harga: 65184 },
+  { id: 'DANA75', nama: 'DANA 75.000',  harga: 75184 },
+  { id: 'DANA95', nama: 'DANA 95.000',  harga: 95184 },
+  { id: 'DANA100',nama: 'DANA 100.000', harga: 100184 },
+];
+
+let selectedProduk = null;
+
+function formatRp(n) {
+  return 'Rp ' + n.toLocaleString('id-ID');
+}
+
+function renderProduk() {
+  const grid = document.getElementById('skeletonGrid');
+  grid.innerHTML = produkDANA.map(p => `
+    <div class="produk-item" id="produk-${p.id}" onclick="selectProduk('${p.id}')">
+      <div class="produk-nominal">${p.nama.replace('DANA ','')}</div>
+      <div class="produk-harga api">${formatRp(p.harga)}</div>
+    </div>
+  `).join('');
+}
+
+function selectProduk(id) {
+  document.querySelectorAll('.produk-item').forEach(el => el.classList.remove('selected'));
+  document.getElementById('produk-' + id).classList.add('selected');
+  selectedProduk = produkDANA.find(p => p.id === id);
+  updateSummary();
+}
+
+function updateSummary() {
+  const no = document.getElementById('noHP').value.trim();
+  const box = document.getElementById('summaryBox');
+  const btn = document.getElementById('btnOrder');
+  if (selectedProduk && no.length >= 10) {
+    box.style.display = 'block';
+    document.getElementById('sumProduk').textContent = selectedProduk.nama;
+    document.getElementById('sumNo').textContent = no;
+    document.getElementById('sumTotal').textContent = formatRp(selectedProduk.harga);
+    btn.disabled = false;
+  } else {
+    box.style.display = 'none';
+    btn.disabled = true;
+  }
+}
+
+document.getElementById('noHP').addEventListener('input', updateSummary);
+
+function confirmOrder() {
+  const no = document.getElementById('noHP').value.trim();
+  if (!no || no.length < 10) { showToast('Masukkan nomor HP yang valid', 'error'); return; }
+  if (!selectedProduk) { showToast('Pilih nominal terlebih dahulu', 'error'); return; }
+  document.getElementById('modalBody').innerHTML = `
+    <div style="line-height:2;">
+      <b>Akun Tujuan:</b> DANA (${no})<br>
+      <b>Nominal Tagihan QRIS:</b> <span style="color:var(--dana-blue);font-weight:700;">${formatRp(selectedProduk.harga)}</span>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('show');
+}
+
+// ─── AMBIL DATA QRIS OTOMATIS REAL-TIME ───
+async function doOrder() {
+  closeModal();
+  const btn = document.getElementById('btnOrder');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span>Membuat QRIS...';
+  
+  const resultCard = document.getElementById('resultTopup');
+  const qrisContainer = document.getElementById('qrisContainerBox');
+  const qrisImgView = document.getElementById('qrisImgView');
+  
+  resultCard.classList.add('show');
+  qrisContainer.style.display = 'none'; // Sembunyikan QRIS lama jika ada
+  
+  document.getElementById('resultIcon').className = 'status-icon pending';
+  document.getElementById('resultIcon').textContent = '⏳';
+  document.getElementById('resultTitle').textContent = 'Menghubungi Server QRIS...';
+  document.getElementById('resultSub').textContent = 'Harap tunggu sebentar';
+  document.getElementById('resultJSON').textContent = '';
+  document.getElementById('resultOrderId').textContent = '';
+
+  const formdata = new FormData();
+  formdata.append('api_key', API_KEY);
+  formdata.append('action', 'get-deposit'); // Mengubah action ke 'get-deposit' agar menghasilkan QRIS
+  formdata.append('jumlah', selectedProduk.harga);
+  formdata.append('type_fee', '1'); // 1 = Customer / 2 = Owner
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST', body: formdata, redirect: 'follow'
+    });
+    const text = await response.text();
+    let result;
+    try { result = JSON.parse(text); } catch(e) { result = { raw: text }; }
+    
+    document.getElementById('resultJSON').textContent = JSON.stringify(result, null, 2);
+    
+    if (result.status === true || result.rc === '00' || result.status === 'success') {
+      document.getElementById('resultIcon').className = 'status-icon success';
+      document.getElementById('resultIcon').textContent = '✅';
+      document.getElementById('resultTitle').textContent = 'QRIS Real-Time Siap!';
+      document.getElementById('resultSub').textContent = 'Scan gambar QRIS di bawah ini untuk membayar.';
+      
+      // Menangkap url gambar QRIS dari payload respon server
+      const qrCodeSource = result.qrcode || result.qr_link || result.qr_content;
+      if (qrCodeSource) {
+        qrisImgView.src = qrCodeSource;
+        qrisContainer.style.display = 'block';
+      }
+      
+      const depositId = result.kode_deposit || result.id || result.order_id;
+      if (depositId) {
+        document.getElementById('resultOrderId').textContent = 'Kode Deposit: ' + depositId + ' (Simpan untuk memantau status masuk)';
+      }
+      showToast('QRIS Sukses Dibuat!', 'success');
+    } else {
+      document.getElementById('resultIcon').className = 'status-icon error';
+      document.getElementById('resultIcon').textContent = '❌';
+      document.getElementById('resultTitle').textContent = 'Gagal';
+      document.getElementById('resultSub').textContent = result.message || result.msg || 'Gagal generate QRIS deposit';
+      showToast('Pembuatan QRIS Gagal', 'error');
+    }
+  } catch(err) {
+    document.getElementById('resultIcon').className = 'status-icon error';
+    document.getElementById('resultIcon').textContent = '❌';
+    document.getElementById('resultTitle').textContent = 'Request Gagal';
+    document.getElementById('resultSub').textContent = err.message;
+    showToast('Koneksi terputus', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Buat QRIS Sekarang';
+  }
+}
+
+// ─── MONITORING STATUS REAL-TIME DEPOSIT ───
+async function cekStatus() {
+  const orderId = document.getElementById('statusOrderId').value.trim();
+  if (!orderId) { showToast('Masukkan Kode Deposit', 'error'); return; }
+
+  const btn = document.querySelector('#tab-status .btn-primary');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="loading-spinner"></span>Mengecek...';
+  const resultCard = document.getElementById('resultStatus');
+  resultCard.classList.add('show');
+  document.getElementById('statusIcon').className = 'status-icon pending';
+  document.getElementById('statusIcon').textContent = '🔍';
+  document.getElementById('statusTitle').textContent = 'Mengecek ke server...';
+  document.getElementById('statusSub').textContent = 'Kode Deposit: ' + orderId;
+  document.getElementById('statusJSON').textContent = '';
+
+  const formdata = new FormData();
+  formdata.append('api_key', API_KEY);
+  formdata.append('action', 'status-deposit'); // Action diubah menjadi status-deposit
+  formdata.append('kode_deposit', orderId);
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST', body: formdata, redirect: 'follow'
+    });
+    const text = await response.text();
+    let result;
+    try { result = JSON.parse(text); } catch(e) { result = { raw: text }; }
+    document.getElementById('statusJSON').textContent = JSON.stringify(result, null, 2);
+    
+    const status = (result.status || result.rc || '').toString().toLowerCase();
+    const isSuccess = status === 'success' || status === 'sukses' || result.status === true;
+    
+    if (isSuccess) {
+      document.getElementById('statusIcon').className = 'status-icon success';
+      document.getElementById('statusIcon').textContent = '✅';
+      document.getElementById('statusTitle').textContent = 'Dana QRIS Sudah Masuk!';
+    } else {
+      document.getElementById('statusIcon').className = 'status-icon pending';
+      document.getElementById('statusIcon').textContent = '⏳';
+      document.getElementById('statusTitle').textContent = 'Menunggu Pembayaran';
+    }
+    document.getElementById('statusSub').textContent = result.message || result.msg || ('ID: ' + orderId);
+  } catch(err) {
+    document.getElementById('statusJSON').textContent = 'Error: ' + err.message;
+    showToast('Gagal memproses data status', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Cek Status QRIS';
+  }
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', (i===0 && tab==='topup') || (i===1 && tab==='status'));
+  });
+  document.getElementById('tab-topup').classList.toggle('active', tab==='topup');
+  document.getElementById('tab-status').classList.toggle('active', tab==='status');
+}
+
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+renderProduk();
+</script>
+</body>
+</html>
